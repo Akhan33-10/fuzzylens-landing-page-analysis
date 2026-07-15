@@ -1,1 +1,75 @@
-# fuzzylens-landing-page-analysis
+# FuzzyLens — E-Commerce Performance Dashboard
+
+A two-page Power BI dashboard analyzing 3 years of e-commerce data (472K+ website sessions, 32K+ orders) for Maven Fuzzy Factory, built to answer core traffic/revenue questions and investigate a landing page performance opportunity in depth.
+
+**Tools:** PostgreSQL · Power BI · DAX · Python (validation)
+
+---
+
+## 📊 Page 1 — Website Traffic Overview
+
+### Business Questions
+1. What is the trend in website sessions and order volume?
+2. What is the session-to-order conversion rate, and how has it trended?
+3. Which marketing channels have been most successful?
+4. How has revenue per order and revenue per session evolved?
+
+### Finding
+- Sessions and orders both grew steadily from March 2012 to March 2015.
+- Conversion rate more than doubled — from ~3% to over 7%.
+- Nonbrand Search campaigns drove over two-thirds of total revenue.
+- Google Search was the single largest source of both traffic and sales.
+- Revenue per session and revenue per order both trended upward over the same period, indicating the business was getting more efficient at monetizing traffic, not just growing traffic volume.
+
+### Action
+- Built a Calendar (date) table with a numeric `YearMonth` key to enable clean, chronologically-sorted monthly trending across sessions, orders, and revenue.
+- Cleaned `utm_source` and `http_referer` fields to resolve literal `"NULL"` text strings (a CSV import artifact) into accurate **Direct** and **Organic** traffic labels, preventing an undercount of real channel performance.
+- Used insight-driven chart titles (e.g., *"Nonbrand Search Drives Over Two-Thirds of Total Revenue"*) so the dashboard communicates findings at a glance, not just raw numbers.
+
+### Impact
+A stakeholder can see, in under 10 seconds, that the business is growing on both traffic and efficiency — and that continued investment in Nonbrand Search is well-supported by the data.
+
+---
+
+## 🔍 Page 2 — Landing Page Performance Deep-Dive
+
+### Problem Faced
+The site had tested **6 different landing pages** over 3 years, each launched and retired at different, mostly non-overlapping times. A naive full-history comparison of conversion rates would be misleading — it would conflate genuine page performance with seasonal and timing effects.
+
+### Why These Two Pages
+Rather than compare all 6 pages carte blanche, I filtered for the only pair that allowed a fair, defensible comparison:
+1. **Overlapping live period** — `/lander-2` and `/lander-5` were the only two pages that ran simultaneously for a meaningful window (Aug 2 – Dec 27, 2014), controlling for seasonality.
+2. **Sufficient traffic volume** — both had tens of thousands of sessions in that window, ruling out small-sample noise.
+3. **Comparable traffic sources** — verified that ~95%+ of both pages' traffic came from the same channels (gsearch/bsearch, nonbrand), ruling out "different visitor quality" as a confound.
+4. **Business relevance** — `/lander-2` was the site's current highest-revenue page; `/lander-5` was its highest-converting page. Comparing the revenue leader against the conversion leader is a genuinely useful business question.
+
+### Finding
+- During the shared window, `/lander-5` converted visitors at **9.95%** vs. **7.48%** for `/lander-2` — a statistically significant difference confirmed with a two-proportion z-test (**p < 0.001**).
+- A funnel analysis (Landing → Cart → Shipping → Billing → Completed Order) showed the gap originates almost entirely at the **first step**: `/lander-5` converted 26% of visitors into the cart stage vs. only 20% for `/lander-2`. From cart onward, both pages performed nearly identically.
+- `/lander-2` had a **50% bounce rate** — half of all visitors left without viewing a second page — compared to **37%** for `/lander-5`.
+- `/lander-5`'s higher conversion wasn't coming at the cost of order quality: it also had a **lower refund rate** (5.9% vs. 8.5%).
+
+### Action
+- Built a `session_landing_page` SQL view to correctly derive each session's true landing page (`MIN(created_at)` per session), since the raw data had no landing-page flag.
+- Validated the comparison window explicitly, rejecting an initial full-history estimate ($249K) once time-overlap analysis showed it wasn't a fair comparison — recalculated using only the true overlapping window.
+- Ran a two-proportion z-test in Python to confirm statistical significance rather than relying on the raw percentage gap alone.
+- Checked refund rate and bounce rate as secondary validation, ruling out "quantity over quality" as an alternate explanation for the conversion gap.
+
+### Impact
+- **Estimated revenue opportunity: ~$30,000 (a ~31% lift)** during the 5-month overlap window alone, if `/lander-2`'s traffic had converted at `/lander-5`'s rate.
+- **Recommendation:** Replace `/lander-2` with `/lander-5` as the default landing page, and use `/lander-5` as the baseline for future landing page tests. Pair this with continued investment in Nonbrand Search — the channel already proven (Page 1) to drive the most revenue — to route more qualified traffic toward the better-converting page.
+
+---
+
+## 🧠 Key Takeaway
+
+The most important finding in this project wasn't a chart — it was a methodology correction. An initial, uncontrolled comparison suggested a ~$249K opportunity. After verifying that the two pages never actually ran during the same time period, and restricting the analysis to the true overlapping window, the defensible number dropped to ~$30K.
+
+**Good analysis isn't about finding the biggest number — it's about finding the number you can confidently stand behind.**
+
+---
+
+## 📂 Project Structure
+- SQL: session landing-page derivation, cohort/overlap-window queries, refund and bounce rate validation
+- Power BI: DAX measures for conversion rate, revenue, funnel stages, and statistical KPIs
+- Python: two-proportion z-test and chi-square validation of the conversion rate difference
