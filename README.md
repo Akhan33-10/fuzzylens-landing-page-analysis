@@ -36,7 +36,10 @@ A stakeholder can see, in under 10 seconds, that the business is growing on both
 ---
 
 ## 🔍 Page 2 — Landing Page Performance Deep-Dive
+### Page 2 — A/B Testing
+![A/B Testing Dashboard](second.png)
 
+Landing page performance deep-dive comparing the site's highest-revenue page against its highest-converting page, with funnel, bounce rate, refund rate, and statistical significance analysis.
 ### Problem Faced
 The site had tested **6 different landing pages** over 3 years, each launched and retired at different, mostly non-overlapping times. A naive full-history comparison of conversion rates would be misleading — it would conflate genuine page performance with seasonal and timing effects.
 
