@@ -7,6 +7,10 @@ A two-page Power BI dashboard analyzing 3 years of e-commerce data (472K+ websit
 ---
 
 ## 📊 Page 1 — Website Traffic Overview
+### Page 1 — Website Traffic
+![Website Traffic Dashboard](first.png)
+
+Trends in sessions, orders, conversion rate, marketing channel performance, and revenue efficiency (Mar 2012 – Mar 2015).
 
 ### Business Questions
 1. What is the trend in website sessions and order volume?
