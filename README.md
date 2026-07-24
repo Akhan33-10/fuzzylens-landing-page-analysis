@@ -6,12 +6,6 @@ A two-page Power BI dashboard analyzing 3 years of e-commerce data (472K+ websit
 
 ---
 
-## 📊 Page 1 — Website Traffic Overview
-### Page 1 — Website Traffic
-![Website Traffic Dashboard](first.png)
-
-Trends in sessions, orders, conversion rate, marketing channel performance, and revenue efficiency (Mar 2012 – Mar 2015).
-
 ### Business Questions
 1. What is the trend in website sessions and order volume?
 2. What is the session-to-order conversion rate, and how has it trended?
@@ -39,6 +33,15 @@ Unlike a pure star schema (one central fact table with dimensions branching dire
 - `product[product_id]` → `order_items[product_id]` — product-level detail for line items.
 
 This structure allowed conversion rate, revenue, and funnel measures to stay filterable by both landing page and date range simultaneously — essential for the overlap-window comparison in the A/B Testing analysis.
+
+
+## 📊 Page 1 — Website Traffic Overview
+### Page 1 — Website Traffic
+![Website Traffic Dashboard](first.png)
+
+Trends in sessions, orders, conversion rate, marketing channel performance, and revenue efficiency (Mar 2012 – Mar 2015).
+
+
 
 ### Finding
 - Sessions and orders both grew steadily from March 2012 to March 2015.
