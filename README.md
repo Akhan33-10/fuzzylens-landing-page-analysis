@@ -18,6 +18,21 @@ Trends in sessions, orders, conversion rate, marketing channel performance, and 
 3. Which marketing channels have been most successful?
 4. How has revenue per order and revenue per session evolved?
 
+
+## Data Model
+
+The model connects six core tables around a central `orders`/`website_sessions` relationship, with a dedicated `session_landing_page` table built specifically to support the landing page analysis.
+
+![FuzzyLens Relationship Model](Fuzzylens_relationship_model.png)
+
+**Key relationships:**
+- `Calendar[Date]` → `orders[created_at]` and `website_sessions[created_at]` — enables consistent time-based trending across both tables from a single date axis.
+- `website_sessions[website_session_id]` → `orders[website_session_id]` — links each order back to its originating session.
+- `website_pageview[website_session_id]` → `website_sessions[website_session_id]` — supports funnel-stage tracking (landing → cart → shipping → billing → completed order).
+- `session_landing_page[website_session_id]` → `website_sessions[website_session_id]` (1:1) — a custom SQL view built to correctly identify each session's true landing page, since the raw data had no landing-page flag. Derived using `ROW_NUMBER()` over `created_at` per session.
+
+This structure allowed conversion rate, revenue, and funnel measures to stay filterable by both landing page and date range simultaneously — essential for the overlap-window comparison in the A/B Testing analysis.
+
 ### Finding
 - Sessions and orders both grew steadily from March 2012 to March 2015.
 - Conversion rate more than doubled — from ~3% to over 7%.
