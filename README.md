@@ -51,6 +51,22 @@ To identify the true landing page for each session and validate the /lander-2 vs
 
 These initial checks revealed that the site had tested 6 different landing pages over time, most of which ran during different, non-overlapping periods — making a fair comparison require filtering down to the two pages that shared a common live window.
 
+## Statistical Analysis
+
+To confirm the landing page conversion rate difference wasn't due to random chance, I ran a two-proportion z-test and a chi-square test of independence in Python.
+
+![Statistical Analysis](fuzzy_statistical_analysis.png)
+
+📄 [statistical_analysis.py](statistical_analysis.py)
+
+**Result:**
+- Z-score: 9.75
+- P-value: 2.10 × 10⁻²² (chi-square cross-check)
+- **Statistically significant at p < 0.001**
+
+This confirms the 2.47 percentage point conversion rate gap between /lander-2 (7.48%) and /lander-5 (9.95%) is a real, reliable difference — not sampling noise — given the sample sizes observed during the overlap window (55,925 combined sessions).
+
+
 
 ## 📊 Page 1 — Website Traffic Overview
 ### Page 1 — Website Traffic
