@@ -35,6 +35,23 @@ Unlike a pure star schema (one central fact table with dimensions branching dire
 This structure allowed conversion rate, revenue, and funnel measures to stay filterable by both landing page and date range simultaneously — essential for the overlap-window comparison in the A/B Testing analysis.
 
 
+## SQL Analysis
+
+To identify the true landing page for each session and validate the /lander-2 vs /lander-5 comparison, I wrote a series of PostgreSQL queries — from checking traffic volume and active date ranges, to building a custom view, to validating traffic source parity, refund rates, and bounce rates.
+
+📄 [View full SQL script](fuzzylens_ab_testing_queries.sql)
+
+**Query: Checking available landing page URLs**
+
+![Fuzzy Query 1](fuzzy_query.png)
+
+**Query: Session volume and date range per landing page**
+
+![Fuzzy Query 2](fuzzy_query_2.png)
+
+These initial checks revealed that the site had tested 6 different landing pages over time, most of which ran during different, non-overlapping periods — making a fair comparison require filtering down to the two pages that shared a common live window.
+
+
 ## 📊 Page 1 — Website Traffic Overview
 ### Page 1 — Website Traffic
 ![Website Traffic Dashboard](first.png)
