@@ -21,15 +21,22 @@ Trends in sessions, orders, conversion rate, marketing channel performance, and 
 
 ## Data Model
 
-The model connects six core tables around a central `orders`/`website_sessions` relationship, with a dedicated `session_landing_page` table built specifically to support the landing page analysis.
+The model connects six core tables around a central `orders` / `website_sessions` relationship, with a dedicated `session_landing_page` table built specifically to support the landing page analysis.
 
 ![FuzzyLens Relationship Model](Fuzzylens_relationship_model.png)
+
+**Schema type: Snowflake schema**
+
+Unlike a pure star schema (one central fact table with dimensions branching directly off it), this model has multiple related fact-level tables — `website_sessions`, `website_pageview`, `orders`, `order_items`, and `order_item_refund` — connected through a chain of relationships, with `Calendar` and `product` serving as supporting dimension tables. This snowflake structure was necessary because the analysis required tracking behavior across multiple stages of the same customer journey (pageview → session → order → refund) rather than a single flat transaction table. The custom `session_landing_page` table was added as a derived lookup table to solve a specific gap: the raw data had no built-in way to identify each session's true landing page, so it was built via SQL (`ROW_NUMBER()` over `created_at` per session) and connected into the model as an additional dimension-like table.
 
 **Key relationships:**
 - `Calendar[Date]` → `orders[created_at]` and `website_sessions[created_at]` — enables consistent time-based trending across both tables from a single date axis.
 - `website_sessions[website_session_id]` → `orders[website_session_id]` — links each order back to its originating session.
 - `website_pageview[website_session_id]` → `website_sessions[website_session_id]` — supports funnel-stage tracking (landing → cart → shipping → billing → completed order).
 - `session_landing_page[website_session_id]` → `website_sessions[website_session_id]` (1:1) — a custom SQL view built to correctly identify each session's true landing page, since the raw data had no landing-page flag. Derived using `ROW_NUMBER()` over `created_at` per session.
+- `order_items[order_id]` → `orders[order_id]` — line-item level detail for each order.
+- `order_item_refund[order_id]` → `orders[order_id]` — supports refund rate validation used in the A/B Testing analysis.
+- `product[product_id]` → `order_items[product_id]` — product-level detail for line items.
 
 This structure allowed conversion rate, revenue, and funnel measures to stay filterable by both landing page and date range simultaneously — essential for the overlap-window comparison in the A/B Testing analysis.
 
